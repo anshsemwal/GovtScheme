@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Find government schemes you're eligible for with our AI assistant">
+    <title>CivicScheme AI | Government Benefits Finder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css?v=1.0.2">
+    <style>
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #09090b;
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .preloader-logo {
+            font-size: 4rem;
+            color: #10b981;
+            animation: preloader-glow 2s infinite ease-in-out;
+        }
+
+        @keyframes preloader-glow {
+
+            0%,
+            100% {
+                filter: drop-shadow(0 0 5px rgba(16, 185, 129, 0.3));
+                transform: scale(1);
+            }
+
+            50% {
+                filter: drop-shadow(0 0 20px #10b981);
+                transform: scale(1.1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Premium Preloader -->
+    <div id="preloader" class="preloader">
+        <div class="preloader-content">
+            <div class="preloader-logo">✦</div>
+            <div class="preloader-title">CivicScheme AI</div>
+            <div class="preloader-line">
+                <div class="preloader-line-fill"></div>
+            </div>
+            <div class="preloader-status">Initializing Neural Engine...</div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <a href="#" class="logo">
+                    <div class="logo-icon">✦</div>
+                    <div class="logo-text">
+                        <h1>CivicScheme AI</h1>
+                    </div>
+                </a>
+                <div class="header-controls">
+                    <!-- Profile Switcher -->
+                    <div class="profile-switcher" id="profileSwitcher">
+                        <button class="profile-btn-main" id="profileBtn">
+                            <span id="currentProfileName">My Profile</span>
+                            <span class="dropdown-arrow">▾</span>
+                        </button>
+                        <div class="profile-dropdown" id="profileDropdown">
+                            <button class="edit-profile-action" id="editProfileAction">
+                                <span>👤</span> Edit Profile
+                            </button>
+                            <div class="dropdown-divider"></div>
+                            <div class="profile-list" id="profileList">
+                                <!-- Profile items injected by JS -->
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <button class="add-profile-item" id="addNewProfileBtnInDropdown">
+                                <span>➕</span> Add New Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <!-- Profile Card -->
+                <div class="profile-card" id="profileCard">
+                    <div class="profile-card-header">
+                        <h3 data-i18n="your_profile">Your Profile</h3>
+                    </div>
+                    <div class="profile-card-body" id="profileCardBody">
+                        <p class="no-profile" data-i18n="complete_profile_msg">Complete your profile to unlock
+                            personalized benefits.</p>
+                    </div>
+                    <div class="profile-completeness">
+                        <div class="completeness-bar">
+                            <div class="completeness-fill" id="completenessBar" style="width: 0%"></div>
+                        </div>
+                        <span class="completeness-text" id="completenessText">0% Complete</span>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="quick-links">
+                    <a href="https://locator.csccloud.in/" target="_blank" class="quick-link" data-i18n="find_csc">
+                        <span>📍</span> Find CSC Center
+                    </a>
+                </div>
+            </aside>
+
+            <!-- Chat Container -->
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Welcome Message / Hero Section -->
+                    <div class="message bot welcome-msg">
+                        <div class="message-content">
+                            <div class="welcome-content">
+                                <span class="welcome-emoji">✦</span>
+                                <h2>Welcome to <span>CivicScheme AI</span></h2>
+                                <p>Discover government schemes you're eligible for. Powered by AI to match you with the
+                                    right benefits.</p>
+
+                                <div class="onboarding-steps">
+                                    <div class="step">
+                                        <div class="step-icon">1</div>
+                                        <div class="step-text">Profile</div>
+                                    </div>
+                                    <div class="step-connector"></div>
+                                    <div class="step">
+                                        <div class="step-icon">2</div>
+                                        <div class="step-text">Match</div>
+                                    </div>
+                                </div>
+
+                                <button class="cta-button" id="startProfileBtn">
+                                    Get Started
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2.5">
+                                        <path d="M5 12h14M12 5l7 7-7 7" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="chat-input-area">
+                    <div class="input-container">
+                        <textarea id="userInput" data-i18n-placeholder="chat_placeholder"
+                            placeholder="Ask about government schemes..." rows="1" aria-label="Chat input"></textarea>
+                        <button class="voice-btn" id="voiceBtn" aria-label="Voice input">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                                <line x1="12" y1="19" x2="12" y2="23" />
+                                <line x1="8" y1="23" x2="16" y2="23" />
+                            </svg>
+                        </button>
+                        <button class="send-btn" id="sendBtn" aria-label="Send">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 12h14M12 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="input-hints">
+                        <span id="voiceStatus">Voice search enabled</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Profile Modal -->
+        <div class="modal-overlay" id="profileModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>👤 Your Profile</h2>
+                    <button class="modal-close" id="closeProfileModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="profileForm">
+                        <!-- Personal Info Section -->
+                        <div class="form-section">
+                            <h3>📋 Personal Information</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="fullName">Full Name</label>
+                                    <input type="text" id="fullName" placeholder="Enter your name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="dob">Date of Birth</label>
+                                    <input type="date" id="dob" max="">
+                                </div>
+                                <div class="form-group">
+                                    <label for="gender">Gender</label>
+                                    <select id="gender">
+                                        <option value="">Select Gender</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="community">Community/Category</label>
+                                    <select id="community">
+                                        <option value="">Select Category</option>
+                                        <option value="General">General</option>
+                                        <option value="SC">SC (Scheduled Caste)</option>
+                                        <option value="ST">ST (Scheduled Tribe)</option>
+                                        <option value="OBC">OBC (Other Backward Class)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Location Section -->
+                        <div class="form-section">
+                            <h3>📍 Location</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="state">State</label>
+                                    <select id="state">
+                                        <option value="">Select State</option>
+                                        <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                        <option value="Assam">Assam</option>
+                                        <option value="Bihar">Bihar</option>
+                                        <option value="Chhattisgarh">Chhattisgarh</option>
+                                        <option value="Delhi">Delhi</option>
+                                        <option value="Goa">Goa</option>
+                                        <option value="Gujarat">Gujarat</option>
+                                        <option value="Haryana">Haryana</option>
+                                        <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                        <option value="Jharkhand">Jharkhand</option>
+                                        <option value="Karnataka">Karnataka</option>
+                                        <option value="Kerala">Kerala</option>
+                                        <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                        <option value="Maharashtra">Maharashtra</option>
+                                        <option value="Odisha">Odisha</option>
+                                        <option value="Punjab">Punjab</option>
+                                        <option value="Rajasthan">Rajasthan</option>
+                                        <option value="Tamil Nadu">Tamil Nadu</option>
+                                        <option value="Telangana">Telangana</option>
+                                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                        <option value="Uttarakhand">Uttarakhand</option>
+                                        <option value="West Bengal">West Bengal</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="areaType">Area Type</label>
+                                    <select id="areaType">
+                                        <option value="">Select Area</option>
+                                        <option value="rural">Rural</option>
+                                        <option value="urban">Urban</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Economic Section -->
+                        <div class="form-section">
+                            <h3>💰 Economic Details</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="occupation">Occupation</label>
+                                    <select id="occupation">
+                                        <option value="">Select Occupation</option>
+                                        <option value="Farmer">Farmer / Agriculture</option>
+                                        <option value="Laborer">Daily Wage Laborer</option>
+                                        <option value="Teacher">Teacher</option>
+                                        <option value="Government">Government Employee</option>
+                                        <option value="Private">Private Sector</option>
+                                        <option value="Business">Business Owner</option>
+                                        <option value="Student">Student</option>
+                                        <option value="Homemaker">Homemaker</option>
+                                        <option value="Retired">Retired</option>
+                                        <option value="Unemployed">Unemployed</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="income">Annual Income (₹)</label>
+                                    <select id="income">
+                                        <option value="">Select Income Range</option>
+                                        <option value="50000">Below ₹50,000</option>
+                                        <option value="100000">₹50,000 - ₹1,00,000</option>
+                                        <option value="200000">₹1,00,000 - ₹2,00,000</option>
+                                        <option value="300000">₹2,00,000 - ₹3,00,000</option>
+                                        <option value="500000">₹3,00,000 - ₹5,00,000</option>
+                                        <option value="750000">₹5,00,000 - ₹7,50,000</option>
+                                        <option value="1000000">₹7,50,000 - ₹10,00,000</option>
+                                        <option value="1500000">Above ₹10,00,000</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="isBPL">
+                                    <span class="checkmark"></span>
+                                    Below Poverty Line (BPL) Card Holder
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="isDisabled">
+                                    <span class="checkmark"></span>
+                                    Person with Disability (PwD)
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="isWidow">
+                                    <span class="checkmark"></span>
+                                    Widow
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="isSenior">
+                                    <span class="checkmark"></span>
+                                    Senior Citizen (60+)
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Family Section -->
+                        <div class="form-section">
+                            <h3>👨‍👩‍👧‍👦 Family Details</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="familySize">Family Size</label>
+                                    <select id="familySize">
+                                        <option value="">Select Size</option>
+                                        <option value="1">1 (Single)</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6+</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="children">Number of Children</label>
+                                    <select id="children">
+                                        <option value="">Select</option>
+                                        <option value="0">None</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3+</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="hasGirlChild">
+                                    <span class="checkmark"></span>
+                                    Has Girl Child (for Sukanya Samriddhi etc.)
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="clearProfileBtn">Clear All</button>
+                    <button class="btn-primary" id="saveProfileBtn">
+                        <span>💾</span> Save Profile
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Family Member Modal -->
+        <div class="modal-overlay" id="familyModal">
+            <div class="modal modal-small">
+                <div class="modal-header">
+                    <h2>👨‍👩‍👧 Add Family Member</h2>
+                    <button class="modal-close" id="closeFamilyModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="familyForm">
+                        <div class="form-group">
+                            <label for="memberName">Name</label>
+                            <input type="text" id="memberName" placeholder="Family member's name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="memberRelation">Relation</label>
+                            <select id="memberRelation" required>
+                                <option value="">Select Relation</option>
+                                <option value="spouse">Spouse</option>
+                                <option value="son">Son</option>
+                                <option value="daughter">Daughter</option>
+                                <option value="father">Father</option>
+                                <option value="mother">Mother</option>
+                                <option value="brother">Brother</option>
+                                <option value="sister">Sister</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="memberAge">Age</label>
+                                <input type="number" id="memberAge" min="0" max="120" placeholder="Age">
+                            </div>
+                            <div class="form-group">
+                                <label for="memberGender">Gender</label>
+                                <select id="memberGender">
+                                    <option value="">Select</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="memberStudent">
+                                <span class="checkmark"></span>
+                                Is a Student
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="memberDisabled">
+                                <span class="checkmark"></span>
+                                Person with Disability
+                            </label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="cancelFamilyBtn">Cancel</button>
+                    <button class="btn-primary" id="saveFamilyBtn">
+                        <span>➕</span> Add Member
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Modal -->
+        <div class="modal-overlay" id="compareModal">
+            <div class="modal modal-large">
+                <div class="modal-header">
+                    <h2>⚖️ Compare Schemes</h2>
+                    <button class="modal-close" id="closeCompareModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="comparison-table" id="comparisonTable">
+                        <!-- Comparison content will be generated here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" id="exportCompareBtn">📄 Export as PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checklist Modal -->
+        <div class="modal-overlay" id="checklistModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>📋 Document Checklist</h2>
+                    <button class="modal-close" id="closeChecklistModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-description">Documents needed for your saved schemes:</p>
+                    <div class="checklist-content" id="checklistContent">
+                        <!-- Checklist items generated here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="shareChecklistBtn">📤 Share via WhatsApp</button>
+                    <button class="btn-primary" id="printChecklistBtn">🖨️ Print</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Application Status Modal -->
+        <div class="modal-overlay" id="statusModal">
+            <div class="modal modal-small">
+                <div class="modal-header">
+                    <h2>📊 Update Status</h2>
+                    <button class="modal-close" id="closeStatusModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Application</label>
+                        <p class="status-scheme-name" id="statusSchemeName"></p>
+                    </div>
+                    <div class="form-group">
+                        <label for="appStatus">Status</label>
+                        <select id="appStatus">
+                            <option value="not_started">📝 Not Started</option>
+                            <option value="documents_ready">📄 Documents Ready</option>
+                            <option value="applied">📬 Applied</option>
+                            <option value="under_review">⏳ Under Review</option>
+                            <option value="approved">✅ Approved</option>
+                            <option value="rejected">❌ Rejected</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="appNotes">Notes</label>
+                        <textarea id="appNotes" placeholder="Add notes about your application..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" id="updateStatusBtn">💾 Update</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div class="toast" id="toast">
+            <span class="toast-icon">✓</span>
+            <span class="toast-message" id="toastMessage">Success!</span>
+        </div>
+
+        <!-- Voice Recording Indicator -->
+        <div class="voice-indicator" id="voiceIndicator">
+            <div class="pulse-ring"></div>
+            <span>🎤 Listening...</span>
+        </div>
+    </div>
+
+    <script src="/static/app.js?v=1.0.2"></script>
+</body>
+
+</html>
