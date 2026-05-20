@@ -13,5 +13,5 @@ services:
         value: 0.0.0.0
       - key: JWT_SECRET_KEY
         generateValue: true
-      - key: HUGGINGFACE_API_KEY
+      - key: MISTRAL_API_KEY
         sync: false
